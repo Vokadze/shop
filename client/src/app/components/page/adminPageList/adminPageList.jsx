@@ -6,6 +6,8 @@ import Pagination from "../../common/pagination";
 import AdminProduct from "../../ui/adminPageUi/adminProduct";
 import AdminTable from "../../ui/adminPageUi/adminTable";
 
+import _ from "lodash";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
     getCategories,
@@ -24,7 +26,9 @@ import "./index.css";
 const AdminPageList = () => {
     const dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState(1);
-    const [sortBy, setSortBy] = useState({ path: "prodNum", order: "asc" });
+    const [searchQuery] = useState("");
+
+    const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
     const pageSize = 3;
 
     const products = useSelector(getProducts());
@@ -47,7 +51,7 @@ const AdminPageList = () => {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [products]);
+    }, [searchQuery, products]);
 
     const handlePageChange = (pageIndex) => {
         setCurrentPage(pageIndex);
@@ -58,42 +62,59 @@ const AdminPageList = () => {
     };
 
     if (products) {
-        const count = products.length;
+        const filteredProducts = searchQuery
+            ? products.filter(
+                  (product) =>
+                      product.prodNum
+                          .toLowerCase()
+                          .indexOf(searchQuery.toLowerCase()) !== -1
+              )
+            : products;
 
-        const productCrop = paginate(products, currentPage, pageSize);
+        const count = filteredProducts.length;
+
+        const sortedProducts = _.orderBy(
+            filteredProducts,
+            [sortBy.path],
+            [sortBy.order]
+        );
+
+        const productCrop = paginate(sortedProducts, currentPage, pageSize);
 
         return (
             <div className="container admin-page-table-all">
                 <div className="admin-page-form">
-                    {categories && !categoriesLoading && (
-                        <div className="container card">
-                            <div className="card-body">
-                                <h6 className="card-title">
-                                    Блок для добавления или редактирования
-                                    товара
-                                </h6>
-                                <AdminProduct products={products} />
+                    <div className="admin-page-form">
+                        {categories && !categoriesLoading && (
+                            <div className="container card">
+                                <div className="card-body">
+                                    <h6 className="card-title">
+                                        Блок для добавления или редактирования
+                                        товара
+                                    </h6>
+                                    <AdminProduct products={products} />
+                                </div>
                             </div>
-                        </div>
-                    )}
-                    <div className="container admin-page-table">
-                        <div className="p-0 m-0">
-                            <AdminTable
-                                data={products && productCrop}
-                                products={productCrop}
-                                onSort={handleSort}
-                                selectedSort={sortBy}
-                                onEdit={handleEdit}
-                                onDelete={handleDelete}
-                            />
-                        </div>
-                        <div className="d-flex justify-content-center">
-                            <Pagination
-                                itemsCount={count}
-                                pageSize={pageSize}
-                                currentPage={currentPage}
-                                onPageChange={handlePageChange}
-                            />
+                        )}
+                        <div className="container admin-page-table">
+                            <div className="p-0 m-0">
+                                <AdminTable
+                                    data={products && productCrop}
+                                    products={productCrop}
+                                    onSort={handleSort}
+                                    selectedSort={sortBy}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
+                                />
+                            </div>
+                            <div className="d-flex justify-content-center">
+                                <Pagination
+                                    itemsCount={count}
+                                    pageSize={pageSize}
+                                    currentPage={currentPage}
+                                    onPageChange={handlePageChange}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
