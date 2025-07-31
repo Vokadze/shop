@@ -9,7 +9,7 @@ import CheckBoxField from "../../common/form/checkBoxField";
 import { useDispatch } from "react-redux";
 import { loadCategoriesList } from "../../../store/categories";
 import { signUp } from "../../../store/users";
-import history from "../../../utils/history";
+// import history from "../../../utils/history";
 
 const RegisterForm = () => {
     const dispatch = useDispatch();
@@ -103,7 +103,7 @@ const RegisterForm = () => {
         if (!isValid) return;
 
         dispatch(signUp(data));
-        history.push("/products");
+        // history.push("/products");
     };
 
     return (
