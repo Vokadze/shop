@@ -83,7 +83,7 @@ const AdminPageList = () => {
 
         return (
             <div className="container admin-page-table-all">
-                <div className="admin-page-form">
+                <div>
                     <div className="admin-page-form">
                         {categories && !categoriesLoading && (
                             <div className="container card">
